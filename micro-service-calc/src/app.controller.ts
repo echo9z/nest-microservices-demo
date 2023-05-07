@@ -18,6 +18,7 @@ export class AppController {
   @MessagePattern('sum')
   sum(numArr: Array<number>): number {
     console.log(numArr);
+    // 调用redis中的微服务
     this.redisClient.emit('set', { key: 'sum', value: numArr });
     return numArr.reduce((total, item) => total + item, 0);
   }

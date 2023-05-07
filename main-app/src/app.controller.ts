@@ -11,6 +11,7 @@ export class AppController {
     @Inject('CALC_SERVICE') private calcClient: ClientProxy,
     @Inject('LOG_SERVICE') private logClient: ClientProxy,
     @Inject('REDIS_SERVICE') private redisClient: ClientProxy,
+    @Inject('AMQP_SERVICE') private rabbitClient: ClientProxy,
   ) {}
 
   @Get()
@@ -31,5 +32,11 @@ export class AppController {
     console.log(numArr);
     this.redisClient.send('set', { key: 'msg', value: numArr.toString()})
     return this.redisClient.send('notifications', numArr);
+  }
+
+  @Get('rabbit')
+  rabbit(@Query('msg') str): string {
+    this.rabbitClient.send('rabbitNot', str).subscribe();
+    return 'ok'
   }
 }

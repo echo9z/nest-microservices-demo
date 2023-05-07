@@ -3,14 +3,15 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ClientProxyFactory, ClientsModule, Transport } from '@nestjs/microservices';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import configuration from './config/configuration'
+import configuration from '../config/configuration'
+import parseEnv from '../config/env';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true, // 全局导入
       cache: true,
-      envFilePath: '.env', // 会读取根文件下 .env文件 `${process.env.NODE_ENV}.env`
+      envFilePath: [parseEnv.path], // 会读取根文件下 .env文件 `${process.env.NODE_ENV}.env`
       load: [configuration], // 读取的是自定义配置文件 configuration.ts 数据配置文件
     }),
     ClientsModule.register([
@@ -29,6 +30,18 @@ import configuration from './config/configuration'
         options: {
           port: 18081
         }
+      },
+      // rabbitmq
+      {
+        name: 'AMQP_SERVICE',
+        transport: Transport.RMQ,
+        options: {
+          urls: ['amqp://rabbit:wzh123@localhost:5672'],
+          queue: 'cats_queue',
+          queueOptions: {
+            durable: false
+          },
+        },
       },
     ])
   ],
